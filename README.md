@@ -15,9 +15,9 @@
 
 #### Anatomy of a Container
 
-- ![Alt text](docker-course-1/resources/image.png)
+- ![Alt text](resources/image.png)
 
-###### Different Kernel Namespaces
+##### Different Kernel Namespaces
 
 | Name   | Description                |
 | ------ | -------------------------- |
@@ -187,3 +187,155 @@ docker run --name website -p 8080:80 -v "$PWD/website:/usr/share/nginx/html" --r
 | staging server             | No tools for running containers across multiple hosts |
 | Continuous integration env | Complex prod envs                                     |
 
+### Samples
+
+```yaml
+version: "20.10.17"
+
+services:
+  storefront: 
+    build: .
+  database: 
+    image: "mysql"
+```
+
+```sh
+# Build images, create containers and start them (a combination of build, create, and start)
+docker-compose up
+
+# Stop containers, delete containers and images, and remove all artifacts (a combination of stop and rm)
+docker-compose down
+
+## restart containers
+docker-compose restart (a combination of stop and start)
+```
+
+- Environment variables
+  - Accessible inside the running docker container
+  - These are useful for
+    - Logger.log("logging from env: {runtime_env}");
+    - If (runtime_env == test) disable_payments();
+    - Could practically be used for anything.
+  - Leaving the value part out in the config imports the variable value from the host that the containers are running on.
+  - Use environment files if the list of variables is too long.
+- Build arguments
+  - Accessible only at build time
+  - These are useful for
+    - Build tool versions
+    - Cloud platform config
+
+```yaml
+version: "20.10.17"
+
+services:
+  storefront:
+    build:
+      context: .
+      args:
+        - region=us-east-1
+        - anshul=0
+    environment:
+      - runtime_env=dev
+  database: 
+    image: "mysql"
+    env_file:
+      - ./mysql/env_vars
+```
+
+### Mounting Volumes
+
+- Target: the target directory for the container's data (inside the container).
+- Source: the source directory from the host. If not defined, DC creates one.
+- Access mode: the default is rw, but we can override it to ro if applicable.
+- Named volumes: allows docker-compose up to copy data from the old volume to the new one by default. `docker-compose down --volumes` deletes any named volumes.
+
+```yaml
+    volumes:
+      - ./mysql:/var/lib/mysql:rw # source:target:mode
+volumes:
+  kineteco:
+```
+
+```yaml
+# long syntax for named volume
+type: volume
+source: kineteco
+target: /var/lib/mysql
+read_only: false
+```
+
+### Exposing Ports
+
+```yaml
+services:
+  scheduler:
+    build: scheduler/.
+    ports:
+      - "81:80"
+  storefront: 
+    build: storefront/.
+    ports:
+      - "80:80"
+      - "443:443"
+  database: 
+    image: "mysql"
+    env_file:
+      - ./mysql/env_vars
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d:ro
+      - kineteco:/var/lib/mysql
+volumes:
+  kineteco: 
+```
+
+### Enforcing Startup Order
+
+- We may need some of the services to be started before the others, and startup order helps with that.
+
+```yaml
+  scheduler:
+    build: scheduler/.
+    ports:
+      - "81:80"
+  storefront: 
+    build: storefront/.
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - database
+  database: 
+    image: "mysql"
+    env_file:
+      - ./mysql/env_vars
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d:ro
+      - kineteco:/var/lib/mysql
+volumes:
+  kineteco: 
+```
+
+## Dynamic Config
+
+- Start all services within a profile using `docker-compose --profile store_services up`
+- The syntax works with all compose commands.
+
+```yaml
+    profiles:
+      - scheduling_services
+```
+
+- We generally want the same compose file for related services but there can be use case to have different ones too.
+  - Distinct desired behaviors that do not coincide.
+  - Different envs (testing vs staging)
+  - Not a good idea to have different files for different components of a single system.
+- Docker compose reads 2 config files by default docker-compose.yaml and docker-compose.override.yaml. Here are the merge rules for them:
+  - Array fields will append the override values and single value properties will have their values overridden.
+  - Override files can be partial or incomplete.
+  - We can also have a bunch of override files and the can be run by using `docker-compose -f docker-compose.yaml -f docker-compose.local.yaml up`
+- We can use env variables from the host by using $ like `image: "mysql:${TAG}"`.
+  - If the variable is not set, docker will default to an empty string.
+  - Inline in docker-compose config
+  - In .env file: reads by default. If it's not in the same directory, we can pass it using: `docker-compose --env-file [path]`
+  - Throw error if missing (no default)
+- A variable in the host will override the default.

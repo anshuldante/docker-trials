@@ -2,6 +2,10 @@ version: "20.10.17"
 
 services:
   storefront: 
-    build: .
+    build:
+      context: .
+      args:
+        - region=us-east-1
+        - anshul=0
   database: 
     image: "mysql"
