@@ -1,8 +1,10 @@
 # Docker Trials
 
-## Docker Gyan
+## Docker
 
-### Containers vs Virtual Machines
+### Basics
+
+#### Containers vs Virtual Machines
 
 | Containers                       | Virtual Machines          |
 | -------------------------------- | ------------------------- |
@@ -11,11 +13,11 @@
 | Do not require OS config         | require OS config         |
 | Usually run one app at a time    | can run many apps at once |
 
-### Anatomy of a Container
+#### Anatomy of a Container
 
 - ![Alt text](docker-course-1/resources/image.png)
 
-#### Different Kernel Namespaces
+###### Different Kernel Namespaces
 
 | Name   | Description                |
 | ------ | -------------------------- |
@@ -38,7 +40,7 @@
 - Natively only runs on Linux, some newer versions of Windows are also supported.
 - Container images are bound to their parent operating systems.
 
-### Advantages of Docker
+#### Advantages of Docker
 
 - Makes configuring and packaging apps and their environments easy.
 - Makes sharing images very easy.
@@ -46,16 +48,16 @@
 
 - Podman and CRI are some advantages.
 
-## Using Docker
+### Using Docker
 
-### Docker Best Practices
+#### Docker Best Practices
 
 - Use verified images. They're simply more secure.
   - Can also use free image scanners like Clair, Trivy, and Dagda.
 - Created proper numbered tags instead of using "latest".
 - Use non-root users.
 
-### Docker CLI
+#### Docker CLI
 
 ```sh
 # Docker CLI help
@@ -145,7 +147,7 @@ docker top xen # to look for culprits killing the container
 docker run -it --name xen xen # for an interactive shell
 ```
 
-### Docker File
+#### Docker File
 
 - FROM: the base image. Docker will pull it from docker hub if it's not already there locally.
 - LABEL: various tagging properties.
@@ -155,7 +157,7 @@ docker run -it --name xen xen # for an interactive shell
 - ENTRYPOINT: defines the entry point of the docker image.
 - CMD: defines the default args for ENTRYPOINT.
 
-### Saving Data from Containers
+#### Saving Data from Containers
 
 ```sh
 # create a file in the container via shell and save it into the machine using volume mounting
@@ -164,3 +166,24 @@ docker run --rm --entrypoint sh -v /tmp/container:/tmp ubuntu -c "echo 'hello th
 # running an nginx server
 docker run --name website -p 8080:80 -v "$PWD/website:/usr/share/nginx/html" --rm nginx
 ```
+
+## Docker Compose
+
+### Compose Basics
+
+| Docker (procedural)                          | Compose (declarative)                             |
+| -------------------------------------------- | ------------------------------------------------- |
+| Series of ordered steps                      | specify end results                               |
+| Based on assumptions about the previous step | System will determine which steps to execute next |
+| Easy to introduce errors                     | Produces the same results every time.             |
+
+- Config files allow for easy version control
+- Self documenting
+- Easier management
+
+| Designed for               | Not designed for                                      |
+| -------------------------- | ----------------------------------------------------- |
+| Local development          | Distributed systems.                                  |
+| staging server             | No tools for running containers across multiple hosts |
+| Continuous integration env | Complex prod envs                                     |
+
