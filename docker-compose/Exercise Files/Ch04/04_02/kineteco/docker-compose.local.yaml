@@ -1,0 +1,7 @@
+services:
+  scheduler:
+    environment:
+      - runtime_env=local
+  storefront:
+    environment:
+      - runtime_env=local

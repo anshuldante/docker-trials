@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  storefront: 
+    build: .
+  database: 
+    image: "mysql"
+    env_file:
+      - ./mysql/env_vars
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d:ro

@@ -1,0 +1,7 @@
+version: "20.10.17"
+
+services:
+  storefront: 
+    build: .
+  database: 
+    image: "mysql"

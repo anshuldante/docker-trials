@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  storefront: 
+    build: 
+      context: .
+      args:
+        - region=us-east-1
+        - alice=0
+    environment:
+      - runtime_env=dev
+  database: 
+    image: "mysql"
+    env_file:
+      - ./mysql/env_vars
