@@ -1,5 +1,5 @@
 FROM ubuntu
-LABEL maintainer="Carlos Nunez <dev@carlosnunez.me>"
+LABEL maintainer="Anshul Agrawal <anshulagrawal.1989@gmail.com>"
 
 USER root
 COPY ./web-server.bash /

@@ -6,7 +6,6 @@ start() {
 
 process() {
   _process() {
-    timeout "$((i*i))" yes &>/dev/null
     echo "Application processing ($1/5)"
   }
 

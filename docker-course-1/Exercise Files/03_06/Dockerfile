@@ -14,7 +14,7 @@ FROM ubuntu
 
 # Some images will contain a LABEL adding additional data, like the maintainer
 # of this image.
-LABEL maintainer="Carlos Nunez <dev@carlosnunez.me>"
+LABEL maintainer="Anshul Agrawal <anshulagrawal.1989@gmail.com>"
 
 # USER tells Docker which user to use for any Dockerfile commands underneath it.
 # By default, Docker will use the `root` user to execute commands. Since

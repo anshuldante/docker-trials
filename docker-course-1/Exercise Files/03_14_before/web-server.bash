@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 start_server() {
-  echo "Server started. Visit http://localhost:5000 to use it."
+  echo "Server started. Visit http://localhost:8080 to use it."
   message=$(echo "<html><body><p>Hello! Today's date is $(date).</p></body></html>")
   length=$(wc -c <<< "$message")
   payload="\
@@ -10,7 +10,7 @@ Content-Length: $((length-1))
 
 $message"
   while true
-  do echo -ne "$payload" | nc -l -p 5000
+  do echo -ne "$payload" | nc -l -p 8080
   done
 }
 
